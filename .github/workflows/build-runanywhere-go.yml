@@ -44,13 +44,54 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Create google-services.json (placeholder for CI)
+        run: |
+          cat > apps/expo-go/android/app/google-services.json << 'EOF'
+          {
+            "project_info": {
+              "project_id": "runanywhere-go-ci",
+              "firebase_url": "https://runanywhere-go-ci.firebaseio.com",
+              "project_number": "000000000000",
+              "name": "RunAnywhere Go CI"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:000000000000:android:0000000000000000",
+                  "android_client_info": {
+                    "package_name": "host.exp.exponent",
+                    "certificate_hash": ""
+                  }
+                },
+                "oauth_client": [],
+                "api_key": [
+                  {
+                    "current_key": "AIzaSyDummy_PlaceholderKey_ForCIBuild"
+                  }
+                ],
+                "services": {
+                  "analytics_service": {
+                    "status": 2,
+                    "analytics_property": {
+                      "tracking_id": ""
+                    }
+                  }
+                }
+              }
+            ],
+            "configuration_version": "1"
+          }
+          EOF
+
       - name: Build Android Release APK
         run: |
           cd apps/expo-go/android
-          ./gradlew app:assembleMobileRelease --no-daemon
+          ./gradlew app:assembleMobileRelease --no-daemon --stacktrace
         env:
           # Skip signing for now (debug signing)
           ANDROID_UNSIGNED: true
+          # Increase Gradle memory
+          GRADLE_OPTS: '-Dorg.gradle.jvmargs=-Xmx4g -XX:+HeapDumpOnOutOfMemoryError'
 
       - name: Rename APK
         run: |

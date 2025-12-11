@@ -1,0 +1,104 @@
+name: Build RunAnywhere Go
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '22'
+  JAVA_VERSION: '17'
+
+jobs:
+  build-android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: |
+          corepack enable
+          yarn install
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Build Android Release APK
+        run: |
+          cd apps/expo-go/android
+          ./gradlew app:assembleMobileRelease --no-daemon
+        env:
+          # Skip signing for now (debug signing)
+          ANDROID_UNSIGNED: true
+
+      - name: Rename APK
+        run: |
+          mkdir -p artifacts
+          cp apps/expo-go/android/app/build/outputs/apk/mobile/release/*.apk artifacts/RunAnywhereGo-android.apk || true
+          cp apps/expo-go/android/app/build/outputs/apk/mobile/debug/*.apk artifacts/RunAnywhereGo-android-debug.apk || true
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: runanywhere-go-android
+          path: artifacts/*.apk
+          if-no-files-found: warn
+
+  # Create release when tag is pushed
+  release:
+    name: Create Release
+    needs: [build-android]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Download Android APK
+        uses: actions/download-artifact@v4
+        with:
+          name: runanywhere-go-android
+          path: ./artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            artifacts/*.apk
+          body: |
+            ## RunAnywhere Go
+
+            Custom Expo Go app with RunAnywhere SDK for on-device AI.
+
+            ### Download
+            - **Android**: Download `RunAnywhereGo-android.apk` below
+            - **iOS**: Coming soon (TestFlight)
+
+            ### Usage
+            1. Install the APK on your Android device
+            2. Open your Expo project on Replit
+            3. Scan the QR code with RunAnywhere Go
+            4. Start building with on-device AI!
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

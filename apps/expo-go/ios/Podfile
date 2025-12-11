@@ -139,6 +139,13 @@ target 'Expo Go' do
         end
       end
 
+      # RunAnywhere SDK - requires C++20 and specific frameworks for on-device AI
+      if pod_name == 'RunAnywhere' || pod_name == 'NitroModules'
+        target_installation_result.native_target.build_configurations.each do |config|
+          config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++20'
+        end
+      end
+
       # Build React Native with RCT_DEV enabled and RCT_ENABLE_INSPECTOR and
       # RCT_ENABLE_PACKAGER_CONNECTION disabled
       next unless pod_name.start_with?('React')

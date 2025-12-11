@@ -117,7 +117,11 @@ android {
     pickFirst "lib/**/libfbjni.so"
     // AGP will give priority of libc++_shared coming from App modules.
     pickFirst "**/libc++_shared.so"
+    // RunAnywhere SDK native libraries
+    pickFirst "**/libjsi.so"
+    pickFirst "**/libfolly_runtime.so"
   }
+
   androidResources {
     ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~'
   }

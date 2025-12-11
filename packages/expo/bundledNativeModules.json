@@ -115,5 +115,7 @@
   "@shopify/react-native-skia": "2.2.12",
   "@shopify/flash-list": "2.0.2",
   "@sentry/react-native": "~7.2.0",
-  "react-native-bootsplash": "^6.3.10"
+  "react-native-bootsplash": "^6.3.10",
+  "react-native-nitro-modules": "^0.31.3",
+  "runanywhere-react-native": "~0.1.3"
 }

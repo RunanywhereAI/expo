@@ -74,6 +74,7 @@
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-keyboard-controller": "^1.18.5",
     "react-native-maps": "1.20.1",
+    "react-native-nitro-modules": "^0.31.3",
     "react-native-pager-view": "6.9.1",
     "react-native-paper": "^5.12.5",
     "react-native-reanimated": "4.1.3",
@@ -86,6 +87,7 @@
     "react-redux": "^7.2.0",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
+    "runanywhere-react-native": "~0.1.3",
     "semver": "^7.6.0",
     "snack-content": "^3.2.0",
     "url": "^0.11.0"
